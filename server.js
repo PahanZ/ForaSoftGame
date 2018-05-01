@@ -9,9 +9,10 @@ const port = 4001;
 io.on('connection', socket => {
     console.log('New user connected');
     const connectionsLength = io.sockets.server.httpServer.connections;
+    console.log(connectionsLength)
     if (connectionsLength === 2) {
-        io.emit('start', 'startGame');
-        console.log('start')
+        io.emit('start', true);
+        console.log('startGame')
     }
     // disconnect is fired when a client leaves the server
     socket.on('disconnect', () => {
