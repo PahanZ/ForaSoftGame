@@ -8,7 +8,11 @@ const port = 4001;
 // This is what the socket.io syntax is like, we will work this later
 io.on('connection', socket => {
     console.log('New user connected');
-
+    const connectionsLength = io.sockets.server.httpServer.connections;
+    if (connectionsLength === 2) {
+        io.emit('start', 'startGame');
+        console.log('start')
+    }
     // disconnect is fired when a client leaves the server
     socket.on('disconnect', () => {
         console.log('User disconnected')
