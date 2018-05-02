@@ -4,12 +4,7 @@ import './index.css';
 import App from './WaitingScreen/App';
 import Game from './PageGame/Game';
 import registerServiceWorker from './registerServiceWorker';
-import {
-    BrowserRouter as Router,
-    Route,
-    Switch,
-    Redirect
-} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 ReactDOM.render(
     <Router>

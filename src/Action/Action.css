@@ -1,0 +1,11 @@
+.action {
+    border: none;
+    background-color: #f1da15;
+    width: 250px;
+    height: 35px;
+    margin: 10px;
+    cursor: pointer;
+}
+.action:hover {
+    background-color: #ffe400;
+}

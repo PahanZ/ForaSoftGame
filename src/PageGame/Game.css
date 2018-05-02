@@ -1,0 +1,16 @@
+.page_game {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    width: 100%;
+    grid-template-columns: repeat(3, 1fr);    
+}
+.title {
+    grid-column: 2;
+    text-align: center;
+}
+.actions {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
