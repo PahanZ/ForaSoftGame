@@ -9,9 +9,11 @@ export default class Decision extends React.Component {
   }
   render() {
     return (
-      <h3>
-        {this.props.content}
-      </h3>
+      <section className="decision">
+        <h3>
+          {this.props.content}
+        </h3>
+      </section>
     )
   }
 } 

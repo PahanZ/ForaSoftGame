@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import './Game.css';
 import Action from '../Action/Action';
 import Decision from '../Decision/Decision';
+import Chat from '../Chat/Chat';
 
 class Game extends Component {
   constructor(props) {
@@ -10,7 +11,8 @@ class Game extends Component {
     this.state = {
       userNumber: '',
       activity: false,
-      decision: ''
+      decision: '',
+      messages: []
     }
     this.actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
     this.connection = io('http://localhost:4001');
@@ -25,6 +27,9 @@ class Game extends Component {
     this.connection.on('decision', decision => {
       this.setState({decision})
     })
+    this.connection.on('chat message', msg => {
+      this.setState({messages: [...this.state.messages, msg]})
+    })
   }
   changeActivity = () => {
     this.setState({ activity: !this.state.activity })
@@ -33,27 +38,30 @@ class Game extends Component {
     const choice = e.target.textContent;
     this.connection.emit('user choice', choice);
     this.setState({activity: !this.state.activity})    
+  } 
+  submitMessage = (e) => {
+    e.preventDefault();
+    const input = e.target.message;
+    this.connection.emit('chat message', input.value);
+    input.value = '';
   }
   render() {
     return (
       <div className="page_game">
         <h1 className="title">Страница игры. Вы игрок {this.state.userNumber}</h1> 
-        <section className="actions">
-          {this.actions.map((el, i) => (
-            <Action
-              key={String(i)}
-              content={el}
-              submit={this.handleSubmit}
-              activity={this.state.activity}
-            />
-          ))}
-        </section>  
-        <section className="decision">
+          <Action
+            submit={this.handleSubmit}
+            activity={this.state.activity}
+            actions={this.actions}
+          />
           <Decision 
             content={this.state.decision} 
             activity={this.changeActivity}
-            />
-        </section>         
+          />
+          <Chat 
+            messages={this.state.messages}
+            submitMessage={this.submitMessage}
+          />
       </div>
     )
   }

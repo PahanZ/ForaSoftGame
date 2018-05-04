@@ -31,6 +31,10 @@ io.on('connection', socket => {
             }, 3000);
         }
     });
+    socket.on('chat message', msg => {
+        console.log('message: ' + msg);
+        io.emit('chat message', msg);
+    });
     // disconnect is fired when a client leaves the server
     socket.on('disconnect', () => {
         console.log('User disconnected')
