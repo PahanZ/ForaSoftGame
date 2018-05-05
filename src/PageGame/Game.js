@@ -9,7 +9,6 @@ export default class extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      userNumber: '',
       activity: false,
       decision: '',
       messages: [],
@@ -32,8 +31,12 @@ export default class extends Component {
       this.setState({ decision });
     });
     this.connection.on('chat message', (msg) => {
+      console.log(msg);
       this.setState({ messages: [...this.state.messages, msg] });
     });
+  }
+  componentWillUnmount() {
+    localStorage.clear();
   }
   changeActivity() {
     this.setState({ activity: !this.state.activity });
@@ -50,6 +53,7 @@ export default class extends Component {
     input.value = '';
   }
   render() {
+    // console.log(this.state);
     return (
       <div className="page_game">
         <h1 className="title">Страница игры. Вы игрок {this.state.userNumber}</h1>

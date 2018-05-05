@@ -6,7 +6,6 @@ const uniqueString = require('unique-string');
 // our localhost port
 const port = 4001;
 
-const choices = [];
 const users = {};
 const games = {};
 
@@ -25,9 +24,10 @@ const rpsls = (p1, p2) => {
   return (p2 === first || p2 === second) ? 'Игрок 1 выиграл!' : 'Игрок 2 выиграл!';
 };
 
+const gameId = uniqueString();
+
 io.on('connection', (socket) => {
   let userId;
-  let gameId;
   console.log('New user connected');
 
   socket.on('user id', (id) => {
@@ -35,24 +35,37 @@ io.on('connection', (socket) => {
       io.emit('user id', id);
     } else {
       userId = uniqueString();
-      users[userId] = userId;
+      users[userId] = {
+        userId,
+        gameId,
+      };
       io.emit('user id', userId);
     }
   });
 
   socket.on('start game', () => {
+    const [firstPlayer, secondPlayer] = Object.keys(users);
     if (Object.keys(users).length === 2) {
-      gameId = uniqueString();
-      games[gameId] = {};
       io.emit('start game', true);
-      console.log(games, gameId, games.gameId);
+      games[gameId] = {};
+      games[gameId][firstPlayer] = {
+        id: firstPlayer,
+        move: '',
+      };
+      games[gameId][secondPlayer] = {
+        id: secondPlayer,
+        move: '',
+      };
     } else {
       io.emit('start game', false);
     }
   });
 
   socket.on('user choice', (id, userChoice) => {
-    console.log(games, gameId, games[gameId]);
+    games[gameId][id].move = userChoice;
+    console.log('games:', games);
+    console.log('id, choice:', id, userChoice);
+    // console.log('users:', users);
     // const user = users[id];
     // choices.push(userChoice);
     // if (choices.length === 2) {
