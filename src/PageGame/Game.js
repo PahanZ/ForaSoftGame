@@ -14,6 +14,7 @@ export default class extends Component {
       decision: '',
       messages: [],
     };
+    this.userId = localStorage.getItem('id');
     this.actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
     this.connection = io('http://localhost:4001');
     this.changeActivity = this.changeActivity.bind(this);
@@ -21,10 +22,10 @@ export default class extends Component {
     this.submitMessage = this.submitMessage.bind(this);
   }
   componentDidMount() {
-    this.connection.on('count', (countUsers) => {
-      this.setState({ userNumber: countUsers });
-      console.log(countUsers);
-    });
+    // this.connection.on('count', (countUsers) => {
+    //   this.setState({ userNumber: countUsers });
+    // });
+    // this.connection.emit('game', this.userId);
   }
   componentDidUpdate() {
     this.connection.on('decision', (decision) => {
@@ -39,7 +40,7 @@ export default class extends Component {
   }
   handleSubmit(e) {
     const choice = e.target.textContent;
-    this.connection.emit('user choice', choice);
+    this.connection.emit('user choice', this.userId, choice);
     this.setState({ activity: !this.state.activity });
   }
   submitMessage(e) {

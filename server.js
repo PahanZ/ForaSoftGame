@@ -1,11 +1,14 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const uniqueString = require('unique-string');
 
 // our localhost port
 const port = 4001;
 
 const choices = [];
+const users = {};
+const games = {};
 
 const rpsls = (p1, p2) => {
   if (p1 === p2) return 'Ничья!';
@@ -23,24 +26,44 @@ const rpsls = (p1, p2) => {
 };
 
 io.on('connection', (socket) => {
+  let userId;
+  let gameId;
   console.log('New user connected');
 
-  http.getConnections((err, countUsers) => {
-    console.log(countUsers);
-    io.emit('count', countUsers);
+  socket.on('user id', (id) => {
+    if (users[id] !== undefined) {
+      io.emit('user id', id);
+    } else {
+      userId = uniqueString();
+      users[userId] = userId;
+      io.emit('user id', userId);
+    }
   });
 
-  socket.on('user choice', (userChoice) => {
-    choices.push(userChoice);
-    if (choices.length === 2) {
-      const decision = rpsls(choices[0], choices[1]);
-      choices.length = 0;
-      io.emit('decision', decision);
-
-      setTimeout(() => {
-        io.emit('decision', '');
-      }, 3000);
+  socket.on('start game', () => {
+    if (Object.keys(users).length === 2) {
+      gameId = uniqueString();
+      games[gameId] = {};
+      io.emit('start game', true);
+      console.log(games, gameId, games.gameId);
+    } else {
+      io.emit('start game', false);
     }
+  });
+
+  socket.on('user choice', (id, userChoice) => {
+    console.log(games, gameId, games[gameId]);
+    // const user = users[id];
+    // choices.push(userChoice);
+    // if (choices.length === 2) {
+    //   const decision = rpsls(choices[0], choices[1]);
+    //   choices.length = 0;
+    //   io.emit('decision', decision);
+
+    //   setTimeout(() => {
+    //     io.emit('decision', '');
+    //   }, 3000);
+    // }
   });
 
   socket.on('chat message', (msg) => {
@@ -50,6 +73,7 @@ io.on('connection', (socket) => {
 
   // disconnect is fired when a client leaves the server
   socket.on('disconnect', () => {
+    delete users[userId];
     console.log('User disconnected');
   });
 });

@@ -7,16 +7,21 @@ import './App.css';
 class App extends Component {
   componentDidMount() {
     const socket = io('http://localhost:4001');
-    socket.on('count', (countUsers) => {
-      if (countUsers >= 2) {
+
+    const id = localStorage.getItem('id');
+    socket.emit('user id', id);
+    socket.on('user id', (userId) => {
+      localStorage.setItem('id', userId);
+    });
+
+    socket.emit('start game');
+    socket.on('start game', (start) => {
+      if (start === true) {
         this.props.history.push('/game');
-      } else {
-        this.props.history.push('/');
       }
     });
   }
   render() {
-    console.log(this.props.history);
     return (
       <div className="waiting_screen">
         <h1>Cсылка для второго игрока</h1>
