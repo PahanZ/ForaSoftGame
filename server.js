@@ -31,9 +31,7 @@ io.on('connection', (socket) => {
   console.log('New user connected');
 
   socket.on('user id', (id) => {
-    if (users[id] !== undefined) {
-      io.emit('user id', id);
-    } else {
+    if (users[id] === undefined) {
       userId = uniqueString();
       users[userId] = {
         userId,
@@ -43,19 +41,18 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('start game', () => {
-    const [firstPlayer, secondPlayer] = Object.keys(users);
-    if (Object.keys(users).length === 2) {
-      io.emit('start game', true);
+  socket.on('start game', (inviteId, id) => {
+    if (users[inviteId]) {
       games[gameId] = {};
-      games[gameId][firstPlayer] = {
-        id: firstPlayer,
+      games[gameId][inviteId] = {
+        id: inviteId,
         move: '',
       };
-      games[gameId][secondPlayer] = {
-        id: secondPlayer,
+      games[gameId][id] = {
+        id,
         move: '',
       };
+      io.emit('start game', true);
     } else {
       io.emit('start game', false);
     }
