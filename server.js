@@ -8,9 +8,12 @@ const port = 4001;
 
 const users = {};
 const games = {};
+const choices = [];
+const gameId = uniqueString();
+let count = 1;
 
 const rpsls = (p1, p2) => {
-  if (p1 === p2) return 'Ничья!';
+  if (p1.userChoice === p2.userChoice) return 'Ничья!';
 
   const rules = {
     rock: ['scissors', 'lizard'],
@@ -20,11 +23,20 @@ const rpsls = (p1, p2) => {
     spock: ['scissors', 'rock'],
   };
 
-  const [first, second] = rules[p1];
-  return (p2 === first || p2 === second) ? 'Игрок 1 выиграл!' : 'Игрок 2 выиграл!';
+  const [first, second] = rules[p1.userChoice];
+  return (p2.userChoice === first || p2.userChoice === second) ?
+    `Player ${p1.numberPlayer} выиграл!`
+    : `Player ${p2.numberPlayer} выиграл!`;
 };
 
-const gameId = uniqueString();
+const createUser = (userId) => {
+  users[userId] = {
+    userId,
+    playerName: `Player ${count}`,
+    gameId,
+  };
+  count += 1;
+};
 
 io.on('connection', (socket) => {
   let userId;
@@ -33,47 +45,54 @@ io.on('connection', (socket) => {
   socket.on('user id', (id) => {
     if (users[id] === undefined) {
       userId = uniqueString();
-      users[userId] = {
-        userId,
-        gameId,
-      };
-      io.emit('user id', userId);
+      createUser(userId);
+      socket.emit('user id', userId, count);
     }
+    console.log(users);
   });
 
   socket.on('start game', (inviteId, id) => {
+    let newId = id;
+    console.log(id);
+    console.log(users);
+    if (users[newId] === undefined) {
+      userId = uniqueString();
+      newId = userId;
+      createUser(userId);
+      socket.emit('user id', newId, count);
+    }
     if (users[inviteId]) {
       games[gameId] = {};
       games[gameId][inviteId] = {
         id: inviteId,
         move: '',
       };
-      games[gameId][id] = {
-        id,
-        move: '',
-      };
-      io.emit('start game', true);
-    } else {
-      io.emit('start game', false);
     }
+    // console.log('users ', users);
+    // console.log('newId ', newId);
+    //   games[gameId][newId] = {
+    //     id,
+    //     move: '',
+    //   };
+    //   io.emit('start game', true);
+    // } else {
+    //   io.emit('start game', false);
+    // }
   });
 
-  socket.on('user choice', (id, userChoice) => {
+  socket.on('user choice', (id, userChoice, numberPlayer) => {
     games[gameId][id].move = userChoice;
-    console.log('games:', games);
-    console.log('id, choice:', id, userChoice);
-    // console.log('users:', users);
-    // const user = users[id];
-    // choices.push(userChoice);
-    // if (choices.length === 2) {
-    //   const decision = rpsls(choices[0], choices[1]);
-    //   choices.length = 0;
-    //   io.emit('decision', decision);
+    choices.push({ numberPlayer, userChoice });
 
-    //   setTimeout(() => {
-    //     io.emit('decision', '');
-    //   }, 3000);
-    // }
+    if (choices.length === 2) {
+      const decision = rpsls(choices[0], choices[1]);
+      choices.length = 0;
+      io.emit('decision', decision);
+
+      setTimeout(() => {
+        io.emit('decision', '');
+      }, 3000);
+    }
   });
 
   socket.on('chat message', (msg) => {
@@ -84,6 +103,7 @@ io.on('connection', (socket) => {
   // disconnect is fired when a client leaves the server
   socket.on('disconnect', () => {
     delete users[userId];
+    delete games[gameId];
     console.log('User disconnected');
   });
 });

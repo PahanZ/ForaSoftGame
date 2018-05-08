@@ -14,6 +14,7 @@ export default class extends Component {
       messages: [],
     };
     this.userId = localStorage.getItem('id');
+    this.numberPlayer = localStorage.getItem('count');
     this.actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
     this.connection = io('http://localhost:4001');
     this.changeActivity = this.changeActivity.bind(this);
@@ -31,7 +32,6 @@ export default class extends Component {
       this.setState({ decision });
     });
     this.connection.on('chat message', (msg) => {
-      console.log(msg);
       this.setState({ messages: [...this.state.messages, msg] });
     });
   }
@@ -43,7 +43,7 @@ export default class extends Component {
   }
   handleSubmit(e) {
     const choice = e.target.textContent;
-    this.connection.emit('user choice', this.userId, choice);
+    this.connection.emit('user choice', this.userId, choice, this.numberPlayer);
     this.setState({ activity: !this.state.activity });
   }
   submitMessage(e) {
@@ -56,7 +56,9 @@ export default class extends Component {
     // console.log(this.state);
     return (
       <div className="page_game">
-        <h1 className="title">Страница игры. Вы игрок {this.state.userNumber}</h1>
+        <h1 className="title">
+          Страница игры. Вы игрок: Player {localStorage.getItem('count')}
+        </h1>
         <Action
           submit={this.handleSubmit}
           activity={this.state.activity}

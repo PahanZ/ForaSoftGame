@@ -9,7 +9,12 @@ class Invite extends React.Component {
     const socket = io('http://localhost:4001');
     const inviteId = this.props.match.params.id.slice(1);
     const id = localStorage.getItem('id');
+
     socket.emit('start game', inviteId, id);
+    socket.on('user id', (userId, count) => {
+      localStorage.setItem('id', userId);
+      localStorage.setItem('count', count);
+    });
     socket.on('start game', (start) => {
       if (start === true) {
         this.props.history.push('/game');
