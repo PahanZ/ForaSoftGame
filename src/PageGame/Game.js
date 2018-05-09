@@ -5,7 +5,7 @@ import Action from '../Action/Action';
 import Decision from '../Decision/Decision';
 import Chat from '../Chat/Chat';
 
-export default class extends Component {
+export default class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,18 +14,12 @@ export default class extends Component {
       messages: [],
     };
     this.userId = localStorage.getItem('id');
-    this.numberPlayer = localStorage.getItem('count');
+    this.name = localStorage.getItem('name');
     this.actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
     this.connection = io('http://localhost:4001');
     this.changeActivity = this.changeActivity.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.submitMessage = this.submitMessage.bind(this);
-  }
-  componentDidMount() {
-    // this.connection.on('count', (countUsers) => {
-    //   this.setState({ userNumber: countUsers });
-    // });
-    // this.connection.emit('game', this.userId);
   }
   componentDidUpdate() {
     this.connection.on('decision', (decision) => {
@@ -35,15 +29,12 @@ export default class extends Component {
       this.setState({ messages: [...this.state.messages, msg] });
     });
   }
-  componentWillUnmount() {
-    localStorage.clear();
-  }
   changeActivity() {
     this.setState({ activity: !this.state.activity });
   }
   handleSubmit(e) {
     const choice = e.target.textContent;
-    this.connection.emit('user choice', this.userId, choice, this.numberPlayer);
+    this.connection.emit('user choice', this.userId, choice, this.name);
     this.setState({ activity: !this.state.activity });
   }
   submitMessage(e) {
@@ -53,11 +44,10 @@ export default class extends Component {
     input.value = '';
   }
   render() {
-    // console.log(this.state);
     return (
       <div className="page_game">
         <h1 className="title">
-          Страница игры. Вы игрок: Player {localStorage.getItem('count')}
+          Страница игры. Вы игрок: {this.name}
         </h1>
         <Action
           submit={this.handleSubmit}

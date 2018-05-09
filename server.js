@@ -25,8 +25,8 @@ const rpsls = (p1, p2) => {
 
   const [first, second] = rules[p1.userChoice];
   return (p2.userChoice === first || p2.userChoice === second) ?
-    `Player ${p1.numberPlayer} выиграл!`
-    : `Player ${p2.numberPlayer} выиграл!`;
+    `${p1.playerName} выиграл!`
+    : `${p2.playerName} выиграл!`;
 };
 
 const createUser = (userId) => {
@@ -46,20 +46,21 @@ io.on('connection', (socket) => {
     if (users[id] === undefined) {
       userId = uniqueString();
       createUser(userId);
-      socket.emit('user id', userId, count);
+      socket.emit('user id', userId, users[userId].playerName);
     }
-    console.log(users);
+    // console.log(users);
   });
 
   socket.on('start game', (inviteId, id) => {
     let newId = id;
-    console.log(id);
-    console.log(users);
+    // console.log('users ', users);
+    // console.log('id ', newId);
+    // console.log('users[newId] ', users[newId]);
     if (users[newId] === undefined) {
       userId = uniqueString();
       newId = userId;
       createUser(userId);
-      socket.emit('user id', newId, count);
+      socket.emit('user id', newId, users[newId].playerName);
     }
     if (users[inviteId]) {
       games[gameId] = {};
@@ -67,22 +68,19 @@ io.on('connection', (socket) => {
         id: inviteId,
         move: '',
       };
+      games[gameId][newId] = {
+        id,
+        move: '',
+      };
+      io.emit('start game', true);
+    } else {
+      io.emit('start game', false);
     }
-    // console.log('users ', users);
-    // console.log('newId ', newId);
-    //   games[gameId][newId] = {
-    //     id,
-    //     move: '',
-    //   };
-    //   io.emit('start game', true);
-    // } else {
-    //   io.emit('start game', false);
-    // }
   });
 
-  socket.on('user choice', (id, userChoice, numberPlayer) => {
+  socket.on('user choice', (id, userChoice, playerName) => {
     games[gameId][id].move = userChoice;
-    choices.push({ numberPlayer, userChoice });
+    choices.push({ playerName, userChoice });
 
     if (choices.length === 2) {
       const decision = rpsls(choices[0], choices[1]);
@@ -102,8 +100,7 @@ io.on('connection', (socket) => {
 
   // disconnect is fired when a client leaves the server
   socket.on('disconnect', () => {
-    delete users[userId];
-    delete games[gameId];
+    // delete users[userId];
     console.log('User disconnected');
   });
 });

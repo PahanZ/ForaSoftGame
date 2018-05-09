@@ -16,9 +16,9 @@ class App extends Component {
 
     if (this.state.id === null) {
       socket.emit('user id', this.state.id);
-      socket.on('user id', (userId, count) => {
+      socket.on('user id', (userId, name) => {
         localStorage.setItem('id', userId);
-        localStorage.setItem('count', count);
+        localStorage.setItem('name', name);
         this.setState({ id: userId });
       });
     }
