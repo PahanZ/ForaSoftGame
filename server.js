@@ -48,7 +48,6 @@ io.on('connection', (socket) => {
       createUser(userId);
       socket.emit('user id', userId, users[userId].playerName);
     }
-    // console.log(users);
   });
 
   socket.on('start game', (inviteId, id) => {
@@ -93,9 +92,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('chat message', (msg) => {
-    console.log(`message: ${msg}`);
-    io.emit('chat message', msg);
+  socket.on('chat message', (name, msg) => {
+    io.emit('chat message', name, msg);
   });
 
   // disconnect is fired when a client leaves the server

@@ -12,7 +12,7 @@ const Chat = props => (
 );
 
 Chat.propTypes = {
-  messages: PropTypes.arrayOf(PropTypes.string).isRequired,
+  messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   submitMessage: PropTypes.func.isRequired,
 };
 

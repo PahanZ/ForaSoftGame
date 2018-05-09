@@ -21,12 +21,14 @@ export default class Game extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.submitMessage = this.submitMessage.bind(this);
   }
+  componentDidMount() {
+    this.connection.on('chat message', (name, msg) => {
+      this.setState({ messages: [...this.state.messages, { name, msg }] });
+    });
+  }
   componentDidUpdate() {
     this.connection.on('decision', (decision) => {
       this.setState({ decision });
-    });
-    this.connection.on('chat message', (msg) => {
-      this.setState({ messages: [...this.state.messages, msg] });
     });
   }
   changeActivity() {
@@ -40,10 +42,11 @@ export default class Game extends Component {
   submitMessage(e) {
     e.preventDefault();
     const input = e.target.message;
-    this.connection.emit('chat message', input.value);
+    this.connection.emit('chat message', this.name, input.value);
     input.value = '';
   }
   render() {
+    console.log(this.state);
     return (
       <div className="page_game">
         <h1 className="title">

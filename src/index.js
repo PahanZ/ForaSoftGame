@@ -7,6 +7,8 @@ import Game from './PageGame/Game';
 import Invite from './Invite/Invite';
 import registerServiceWorker from './registerServiceWorker';
 
+console.log(localStorage.getItem('id'));
+
 ReactDOM.render(
   <Router>
     <Switch >
