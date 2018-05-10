@@ -29,11 +29,12 @@ const rpsls = (p1, p2) => {
     : `${p2.playerName} выиграл!`;
 };
 
-const createUser = (userId) => {
+const createUser = (userId, socketId) => {
   users[userId] = {
     userId,
     playerName: `Player ${count}`,
     gameId,
+    socketId,
   };
   count += 1;
 };
@@ -42,53 +43,49 @@ io.on('connection', (socket) => {
   let userId;
   console.log('New user connected');
 
-  socket.on('user id', (id) => {
-    if (users[id] === undefined) {
-      userId = uniqueString();
-      createUser(userId);
-      socket.emit('user id', userId, users[userId].playerName);
-    }
-  });
-
   socket.on('start game', (inviteId, id) => {
     let newId = id;
-    // console.log('users ', users);
-    // console.log('id ', newId);
-    // console.log('users[newId] ', users[newId]);
     if (users[newId] === undefined) {
       userId = uniqueString();
       newId = userId;
-      createUser(userId);
-      socket.emit('user id', newId, users[newId].playerName);
+      createUser(userId, socket.id);
+      const { socketId } = users[newId];
+      io.sockets.sockets[socketId]
+        .emit('start game', false, { newId, name: users[userId].playerName });
+      console.log(users[newId]);
     }
     if (users[inviteId]) {
       games[gameId] = {};
       games[gameId][inviteId] = {
         id: inviteId,
         move: '',
+        socketId: users[inviteId].socketId,
       };
       games[gameId][newId] = {
-        id,
+        id: newId,
         move: '',
+        socketId: users[newId].socketId,
       };
-      io.emit('start game', true);
-    } else {
-      io.emit('start game', false);
+      Object.values(games[gameId]).forEach((el) => {
+        io.sockets.sockets[el.socketId].emit('start game', true);
+      });
     }
   });
 
   socket.on('user choice', (id, userChoice, playerName) => {
-    games[gameId][id].move = userChoice;
-    choices.push({ playerName, userChoice });
+    if (users[id]) {
+      games[gameId][id].move = userChoice;
+      choices.push({ playerName, userChoice });
 
-    if (choices.length === 2) {
-      const decision = rpsls(choices[0], choices[1]);
-      choices.length = 0;
-      io.emit('decision', decision);
+      if (choices.length === 2) {
+        const decision = rpsls(choices[0], choices[1]);
+        choices.length = 0;
+        io.emit('decision', decision);
 
-      setTimeout(() => {
-        io.emit('decision', '');
-      }, 3000);
+        setTimeout(() => {
+          io.emit('decision', '');
+        }, 3000);
+      }
     }
   });
 

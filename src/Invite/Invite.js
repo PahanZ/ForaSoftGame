@@ -11,11 +11,11 @@ class Invite extends React.Component {
     const id = localStorage.getItem('id');
 
     socket.emit('start game', inviteId, id);
-    socket.on('user id', (userId, name) => {
-      localStorage.setItem('id', userId);
-      localStorage.setItem('name', name);
-    });
-    socket.on('start game', (start) => {
+    socket.on('start game', (start, params) => {
+      if (params) {
+        localStorage.setItem('id', params.newId);
+        localStorage.setItem('name', params.name);
+      }
       if (start === true) {
         this.props.history.push('/game');
       }
