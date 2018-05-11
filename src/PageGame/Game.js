@@ -13,8 +13,8 @@ export default class Game extends Component {
       decision: '',
       messages: [],
     };
-    this.userId = localStorage.getItem('id');
-    this.name = localStorage.getItem('name');
+    this.userId = sessionStorage.getItem('id');
+    this.name = sessionStorage.getItem('name');
     this.actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
     this.connection = io('http://localhost:4001');
     this.changeActivity = this.changeActivity.bind(this);

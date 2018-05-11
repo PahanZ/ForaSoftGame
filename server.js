@@ -52,7 +52,6 @@ io.on('connection', (socket) => {
       const { socketId } = users[newId];
       io.sockets.sockets[socketId]
         .emit('start game', false, { newId, name: users[userId].playerName });
-      console.log(users[newId]);
     }
     if (users[inviteId]) {
       games[gameId] = {};
@@ -64,8 +63,10 @@ io.on('connection', (socket) => {
       games[gameId][newId] = {
         id: newId,
         move: '',
-        socketId: users[newId].socketId,
+        socketId: socket.id,
       };
+      users[newId].socketId = socket.id;
+      console.log('start');
       Object.values(games[gameId]).forEach((el) => {
         io.sockets.sockets[el.socketId].emit('start game', true);
       });
