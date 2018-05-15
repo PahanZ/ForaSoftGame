@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-// import io from 'socket.io-client';
 import { withRouter } from 'react-router-dom';
-// import PropTypes from 'prop-types';
-import resReq from '../helper';
+import PropTypes from 'prop-types';
+import { addUser, redirect } from '../helper';
 import './App.css';
 
 class App extends Component {
@@ -13,19 +12,12 @@ class App extends Component {
   //   };
   // }
   componentDidMount() {
-    // const socket = io('http://localhost:4001');
-    // const id = sessionStorage.getItem('id');
-    resReq();
-    // socket.emit('start game', null, id);
-    // socket.on('start game', (start, params) => {
-    //   if (params) {
-    //     sessionStorage.setItem('id', params.newId);
-    //     sessionStorage.setItem('name', params.name);
-    //   }
-    //   if (start === true) {
-    //     this.props.history.push('/game');
-    //   }
-    // });
+    addUser();
+    redirect().then((status) => {
+      if (status === true) {
+        this.props.history.push('/game');
+      }
+    });
   }
   render() {
     return (
@@ -40,12 +32,12 @@ class App extends Component {
 }
 
 App.propTypes = {
-  // history: PropTypes.objectOf(PropTypes.oneOfType([
-  //   PropTypes.string,
-  //   PropTypes.number,
-  //   PropTypes.func,
-  //   PropTypes.objectOf(PropTypes.string),
-  // ])).isRequired,
+  history: PropTypes.objectOf(PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.func,
+    PropTypes.objectOf(PropTypes.string),
+  ])).isRequired,
 };
 
 export default withRouter(App);

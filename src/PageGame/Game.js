@@ -5,6 +5,8 @@ import Action from '../Action/Action';
 import Decision from '../Decision/Decision';
 import Chat from '../Chat/Chat';
 
+const actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
+
 export default class Game extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +17,6 @@ export default class Game extends Component {
     };
     this.userId = sessionStorage.getItem('id');
     this.name = sessionStorage.getItem('name');
-    this.actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
     this.connection = io('http://localhost:4001');
     this.changeActivity = this.changeActivity.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -23,6 +24,7 @@ export default class Game extends Component {
   }
   componentDidMount() {
     this.connection.on('chat message', (name, msg) => {
+      console.log(this.state.messages);
       this.setState({ messages: [...this.state.messages, { name, msg }] });
     });
   }
@@ -37,16 +39,16 @@ export default class Game extends Component {
   handleSubmit(e) {
     const choice = e.target.textContent;
     this.connection.emit('user choice', this.userId, choice, this.name);
+    console.log(this.userId, choice, this.name);
     this.setState({ activity: !this.state.activity });
   }
   submitMessage(e) {
     e.preventDefault();
     const input = e.target.message;
-    this.connection.emit('chat message', this.name, input.value);
+    this.connection.emit('chat message', this.userId, this.name, input.value);
     input.value = '';
   }
   render() {
-    console.log(this.state);
     return (
       <div className="page_game">
         <h1 className="title">
@@ -55,7 +57,7 @@ export default class Game extends Component {
         <Action
           submit={this.handleSubmit}
           activity={this.state.activity}
-          actions={this.actions}
+          actions={actions}
         />
         <Decision
           content={this.state.decision}
