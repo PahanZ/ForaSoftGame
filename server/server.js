@@ -44,13 +44,15 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('chat message', (userId, name, msg) => {
-    // Object.values(games[gameId]).forEach((el) => {
-    //   el.messages.push(msg);
-    //   io.sockets.sockets[el.socketId].emit('chat message', name, el.messages);
-    // });
-    games[gameId][userId].messages.push(msg);
-    io.emit('chat message', name, msg);
+  socket.on('chat message', (data) => {
+    Object.values(games[gameId]).forEach((el) => {
+      el.messages.push(data);
+      // console.log(el.socketId);
+      io.sockets.sockets[el.socketId].emit('chat message', el.messages);
+    });
+    // games[gameId][userId].messages.push(msg);
+    // console.log(games[gameId]);
+    // io.emit('chat message', data);
   });
   // disconnect is fired when a client leaves the server
   socket.on('disconnect', () => {

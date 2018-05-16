@@ -23,9 +23,9 @@ export default class Game extends Component {
     this.submitMessage = this.submitMessage.bind(this);
   }
   componentDidMount() {
-    this.connection.on('chat message', (name, msg) => {
-      console.log(this.state.messages);
-      this.setState({ messages: [...this.state.messages, { name, msg }] });
+    this.connection.on('chat message', (data) => {
+      console.log(data);
+      this.setState({ messages: [...this.state.messages, data] });
     });
   }
   componentDidUpdate() {
@@ -45,7 +45,12 @@ export default class Game extends Component {
   submitMessage(e) {
     e.preventDefault();
     const input = e.target.message;
-    this.connection.emit('chat message', this.userId, this.name, input.value);
+    this.connection.emit('chat message', {
+      id: this.userId,
+      name: this.name,
+      message: input.value,
+      time: new Date(),
+    });
     input.value = '';
   }
   render() {
