@@ -1,7 +1,7 @@
 const { games, users } = require('./store');
 
 const createGame = ({
-  gameId, inviteId, id, socketId,
+  gameId, inviteId, userId, socketId,
 }) => {
   games[gameId] = {};
   games[gameId][inviteId] = {
@@ -10,8 +10,8 @@ const createGame = ({
     socketId: users[inviteId].socketId,
     messages: [],
   };
-  games[gameId][id] = {
-    id,
+  games[gameId][userId] = {
+    id: userId,
     move: '',
     socketId,
     messages: [],

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { addUser, redirect } from '../helper';
+import { addUser, redirect } from '../API';
 import './App.css';
 
 class App extends Component {

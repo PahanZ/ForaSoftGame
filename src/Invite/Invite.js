@@ -1,7 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { addUser, startGame, redirect } from '../helper';
+import { addUser, startGame, redirect } from '../API';
 import './invite.css';
 
 class Invite extends React.Component {

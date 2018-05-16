@@ -3,15 +3,15 @@ const addUser = require('./addUser');
 let count = 1;
 
 const createUser = ({
-  id, gameId, socketId,
+  userId, gameId, socketId,
 }) => {
   const user = {
-    id,
+    userId,
     playerName: `Player ${count}`,
     gameId,
     socketId,
   };
-  addUser(id, user);
+  addUser(userId, user);
   count += 1;
 };
 

@@ -13,17 +13,18 @@ const gameId = uniqueString();
 
 io.on('connection', (socket) => {
   console.log('New user connected');
-  let { id } = socket.handshake.query;
 
-  if (users[id] === undefined) {
-    id = uniqueString();
-    createUser({ id, gameId, socketId: socket.id });
-    socket.emit('user data', { id, name: users[id].playerName });
+  let { userId } = socket.handshake.query;
+
+  if (users[userId] === undefined) {
+    userId = uniqueString();
+    createUser({ userId, gameId, socketId: socket.id });
+    socket.emit('user data', { userId, name: users[userId].playerName });
   }
   socket.on('start game', (inviteId) => {
     if (users[inviteId]) {
       createGame({
-        gameId, inviteId, id, socketId: socket.id,
+        gameId, inviteId, userId, socketId: socket.id,
       });
       Object.values(games[gameId]).forEach((el) => {
         io.sockets.sockets[el.socketId].emit('start game', true);
@@ -31,10 +32,10 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('user choice', (userId, userChoice, playerName) => {
-    if (users[userId]) {
-      games[gameId][userId].move = userChoice;
-      choices.push({ playerName, userChoice });
+  socket.on('user choice', (data) => {
+    if (users[data.userId]) {
+      games[gameId][data.userId].move = data.choice;
+      choices.push({ playerName: data.name, userChoice: data.choice });
 
       if (choices.length === 2) {
         const decision = rpsls(choices[0], choices[1]);
@@ -45,15 +46,18 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (data) => {
+    console.log(games[gameId]);
     Object.values(games[gameId]).forEach((el) => {
       el.messages.push(data);
-      // console.log(el.socketId);
+      console.log('socket id', socket.id);
+      console.log('el socketId', el.socketId);
       io.sockets.sockets[el.socketId].emit('chat message', el.messages);
     });
     // games[gameId][userId].messages.push(msg);
     // console.log(games[gameId]);
     // io.emit('chat message', data);
   });
+
   // disconnect is fired when a client leaves the server
   socket.on('disconnect', () => {
     // delete users[id];
