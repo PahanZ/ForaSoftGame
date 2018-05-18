@@ -22,19 +22,20 @@ export default class Game extends Component {
   }
   componentDidMount() {
     this.connection.on('chat message', (data) => {
-      this.setState({ messages: [...this.state.messages, data] });
+      this.setState({ messages: data });
     });
   }
   componentDidUpdate() {
     const promise = new Promise((resolve) => {
       this.connection.on('decision', (decision) => {
+        console.log(decision);
         this.setState({ decision });
         resolve();
       });
     });
     promise.then(() => {
       setTimeout(() => {
-        this.setState({ decision: '', activity: !this.state.activity });
+        this.setState({ decision: '', activity: false });
       }, 3000);
     });
   }
@@ -57,6 +58,7 @@ export default class Game extends Component {
     input.value = '';
   }
   render() {
+    console.log(this.state);
     return (
       <div className="page_game">
         <h1 className="title">
