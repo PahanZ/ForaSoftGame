@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import io from 'socket.io-client';
 import './Game.css';
 import Action from '../Action/Action';
 import Decision from '../Decision/Decision';
 import Chat from '../Chat/Chat';
-import { userChoice, submitMessage } from '../API';
+import { userChoice, sentMessage, socket } from '../API';
 
 const actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
 
@@ -16,19 +15,16 @@ export default class Game extends Component {
       decision: '',
       messages: [],
     };
-    this.connection = io('http://localhost:4001');
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.submitMessage = this.submitMessage.bind(this);
   }
   componentDidMount() {
-    this.connection.on('chat message', (data) => {
+    socket.on('chat message', (data) => {
       this.setState({ messages: data });
     });
   }
   componentDidUpdate() {
     const promise = new Promise((resolve) => {
-      this.connection.on('decision', (decision) => {
-        console.log(decision);
+      socket.on('decision', (decision) => {
         this.setState({ decision });
         resolve();
       });
@@ -42,20 +38,9 @@ export default class Game extends Component {
   handleSubmit(e) {
     const choice = e.target.textContent;
     userChoice({
-      connection: this.connection,
       choice,
     });
     this.setState({ activity: !this.state.activity });
-  }
-  submitMessage(e) {
-    e.preventDefault();
-    const input = e.target.message;
-    submitMessage({
-      connection: this.connection,
-      message: input.value,
-      time: new Date(),
-    });
-    input.value = '';
   }
   render() {
     console.log(this.state);
@@ -74,7 +59,9 @@ export default class Game extends Component {
         />
         <Chat
           messages={this.state.messages}
-          submitMessage={this.submitMessage}
+          submitMessage={(e) => {
+            sentMessage(e);
+          }}
         />
       </div>
     );

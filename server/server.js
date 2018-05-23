@@ -15,7 +15,6 @@ io.on('connection', (socket) => {
   console.log('New user connected');
 
   let { userId } = socket.handshake.query;
-
   if (users[userId] === undefined) {
     userId = uniqueString();
     createUser({ userId, gameId, socketId: socket.id });
@@ -36,7 +35,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('user choice', (data) => {
-    // users[data.userId].socketId = socket.id; // если раскоментить строку, то всё гуд
     if (users[data.userId]) {
       games[gameId][data.userId].move = data.choice;
       games[gameId][data.userId].playerName = data.name;
@@ -50,8 +48,6 @@ io.on('connection', (socket) => {
         Object.values(users).forEach((el) => {
           if (gamesData[0].id === el.userId ||
               gamesData[1].id === el.userId) {
-            console.log('socket id ', socket.id); // текущий сокет айди(отличается от записанного в юзерс)
-            console.log('element socket id ', el.socketId); // сокет айди, записанный в юзерс
             io.sockets.sockets[el.socketId].emit('decision', decision);
             games[gameId][el.userId].move = '';
           }
@@ -61,23 +57,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', (data) => {
-    console.log('users ', users);
-    console.log('games ', games);
     games[gameId][data.userId].socketId = socket.id;
     Object.values(games[gameId]).forEach((el) => {
       el.messages.push(data);
-      // console.log('socket id', socket.id);
-      // console.log('el socketId', el.socketId);
       io.sockets.sockets[el.socketId].emit('chat message', el.messages);
     });
-    // games[gameId][userId].messages.push(msg);
-    // console.log(games[gameId]);
-    // io.emit('chat message', data);
   });
 
   // disconnect is fired when a client leaves the server
   socket.on('disconnect', () => {
-    // delete users[id];
     console.log('User disconnected');
   });
 });

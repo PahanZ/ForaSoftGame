@@ -2,6 +2,13 @@
   "name": "rockpaper-scissors-spock-lizard-game",
   "version": "0.1.0",
   "private": true,
+  "keywords": [
+    "javascript",
+    "react",
+    "rect-router",
+    "nodejs",
+    "socketio"
+  ],
   "dependencies": {
     "express": "^4.15.2",
     "prop-types": "^15.6.1",

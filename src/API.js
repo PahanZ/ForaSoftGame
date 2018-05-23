@@ -1,7 +1,10 @@
 import io from 'socket.io-client';
 
-const userId = sessionStorage.getItem('id');
-const socket = io('http://localhost:4001', { query: { userId } });
+const socket = io('http://localhost:4001', {
+  query: {
+    userId: sessionStorage.getItem('id'),
+  },
+});
 
 const addUser = () => {
   socket.on('user data', (data) => {
@@ -22,26 +25,24 @@ const redirect = () => (
   })
 );
 
-const userChoice = ({
-  connection, choice,
-}) => {
-  connection.emit('user choice', {
+const userChoice = ({ choice }) => {
+  socket.emit('user choice', {
     userId: sessionStorage.getItem('id'),
     choice,
     name: sessionStorage.getItem('name'),
   });
 };
 
-
-const submitMessage = ({
-  connection, message, time,
-}) => {
-  connection.emit('chat message', {
+const sentMessage = (e) => {
+  e.preventDefault();
+  const input = e.target.message;
+  socket.emit('chat message', {
     userId: sessionStorage.getItem('id'),
     name: sessionStorage.getItem('name'),
-    message,
-    time,
+    message: input.value,
+    time: new Date(),
   });
+  input.value = '';
 };
 
-export { addUser, startGame, redirect, userChoice, submitMessage };
+export { addUser, startGame, redirect, userChoice, sentMessage, socket };
