@@ -4,8 +4,7 @@ import Action from '../Action/Action';
 import Decision from '../Decision/Decision';
 import Chat from '../Chat/Chat';
 import { userChoice, sentMessage, socket } from '../API';
-
-const actions = ['rock', 'paper', 'scissors', 'lizard', 'spock'];
+import actions from './icons';
 
 export default class Game extends Component {
   constructor(props) {
@@ -36,14 +35,13 @@ export default class Game extends Component {
     });
   }
   handleSubmit(e) {
-    const choice = e.target.textContent;
+    const choice = e.target.alt;
     userChoice({
       choice,
     });
     this.setState({ activity: !this.state.activity });
   }
   render() {
-    console.log(this.state);
     return (
       <div className="page_game">
         <h1 className="title">

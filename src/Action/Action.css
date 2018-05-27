@@ -1,11 +1,12 @@
 .action {
     border: none;
-    background-color: #f1da15;
-    width: 250px;
-    height: 35px;
+    background-color: transparent;
     margin: 10px;
     cursor: pointer;
 }
-.action:hover {
-    background-color: #ffe400;
+.action img {
+    height: 80px;
+}
+.disable {
+    filter: grayscale(100%);
 }

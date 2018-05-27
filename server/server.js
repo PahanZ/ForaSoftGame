@@ -35,6 +35,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('user choice', (data) => {
+    console.log(data);
     if (users[data.userId]) {
       games[gameId][data.userId].move = data.choice;
       games[gameId][data.userId].playerName = data.name;

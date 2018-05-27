@@ -14,7 +14,11 @@ const Action = props => (
           props.submit(e);
         }}
       >
-        {el}
+        <img
+          className={props.activity ? 'disable' : null}
+          src={el.src}
+          alt={el.alt}
+        />
       </button>
     ))
   }
@@ -22,7 +26,7 @@ const Action = props => (
 );
 
 Action.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  actions: PropTypes.arrayOf(PropTypes.object).isRequired,
   activity: PropTypes.bool.isRequired,
 };
 
