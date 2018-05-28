@@ -5,26 +5,32 @@ import { addUser, redirect } from '../API';
 import './App.css';
 
 class App extends Component {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     id: sessionStorage.getItem('id'),
-  //   };
-  // }
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: sessionStorage.getItem('id'),
+    };
+  }
   componentDidMount() {
-    addUser();
+    addUser().then((id) => {
+      this.updateId(id);
+    });
+
     redirect().then((status) => {
       if (status === true) {
         this.props.history.push('/game');
       }
     });
   }
+  updateId(id) {
+    this.setState({ id });
+  }
   render() {
     return (
       <div className="waiting_screen">
         <h1>Cсылка для второго игрока</h1>
-        <a href={`${window.location.href}${sessionStorage.getItem('id')}`}>
-          {`${window.location.href}invite:${sessionStorage.getItem('id')}`}
+        <a href={`${window.location.href}${this.state.id}`}>
+          {`${window.location.href}invite:${this.state.id}`}
         </a>
       </div>
     );

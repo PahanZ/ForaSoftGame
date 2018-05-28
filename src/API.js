@@ -6,12 +6,15 @@ const socket = io('http://localhost:4001', {
   },
 });
 
-const addUser = () => {
-  socket.on('user data', (data) => {
-    sessionStorage.setItem('id', data.userId);
-    sessionStorage.setItem('name', data.name);
-  });
-};
+const addUser = () => (
+  new Promise((resolve) => {
+    socket.on('user data', (data) => {
+      sessionStorage.setItem('id', data.userId);
+      sessionStorage.setItem('name', data.name);
+      resolve(data.userId);
+    });
+  })
+);
 
 const startGame = (inviteId = null) => {
   socket.emit('start game', inviteId);
